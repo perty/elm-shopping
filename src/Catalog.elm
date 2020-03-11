@@ -12,6 +12,8 @@ type alias CatalogItem =
 
 catalogItems : List CatalogItem
 catalogItems =
-    [ CatalogItem 1 "Super fluid" (eur 2599)
-    , CatalogItem 2 "Twat, super" (eur 355)
+    [ CatalogItem 1 "Backstage passes" (eur 2599)
+    , CatalogItem 2 "Aged Brie" (eur 355)
+    , CatalogItem 3 "Sulfuras" (eur 404)
+    , CatalogItem 4 "Conjured" (eur 1337)
     ]
