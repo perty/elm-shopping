@@ -6,6 +6,8 @@
 .row {
     display: flex;
     flex-direction: row;
+    flex-flow: wrap;
+    justify-content: space-between;
 }
 
 .cart {
@@ -14,10 +16,22 @@
     padding: 10px;
 }
 
+.description {
+    text-align: left
+}
+
+.price {
+    text-align: right;
+}
+
 .quantity {
     text-align: right;
 }
 
 .total {
     text-align: right;
+}
+
+.cartItems {
+    border-bottom: 1px solid;
 }

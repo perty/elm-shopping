@@ -6,7 +6,7 @@ import Html exposing (Html, button, div, h1, table, tbody, td, text, th, thead, 
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Money exposing (..)
-import ShoppingCart exposing (ShoppingCart, ShoppingCartItem, addItem)
+import ShoppingCart exposing (ShoppingCart, ShoppingCartItem, addItem, removeItem)
 
 
 main =
@@ -20,6 +20,8 @@ main =
 
 type Msg
     = AddToCart CatalogItem
+    | RemoveCartItem ShoppingCartItem
+    | AddCartItem ShoppingCartItem
 
 
 type alias Model =
@@ -50,6 +52,12 @@ update msg model =
         AddToCart catalogItem ->
             ( { model | cart = addItem model.cart catalogItem }, Cmd.none )
 
+        RemoveCartItem item ->
+            ( { model | cart = removeItem model.cart item }, Cmd.none )
+
+        AddCartItem item ->
+            ( { model | cart = addItem model.cart item }, Cmd.none )
+
 
 
 -- View
@@ -75,7 +83,11 @@ viewCatalogItems : Html Msg
 viewCatalogItems =
     table []
         [ thead []
-            [ tr [] [ th [] [ text "Description" ], th [] [ text "Price" ], th [] [ text "Add" ] ]
+            [ tr []
+                [ th [ class "description" ] [ text "Description" ]
+                , th [ class "price" ] [ text "Price" ]
+                , th [] [ text "Add" ]
+                ]
             ]
         , tbody [] (List.map viewCatalogItem catalogItems)
         ]
@@ -101,11 +113,11 @@ viewCart cart =
 
 viewCartItems : ShoppingCart -> Html Msg
 viewCartItems cart =
-    table []
+    table [ class "cartItems" ]
         [ thead []
             [ tr []
-                [ th [] [ text "Description" ]
-                , th [] [ text "Price" ]
+                [ th [ class "description" ] [ text "Description" ]
+                , th [ class "price" ] [ text "Price" ]
                 , th [ class "quantity" ] [ text "Quantity" ]
                 , th [ class "total" ] [ text "Total" ]
                 ]
@@ -117,10 +129,19 @@ viewCartItems cart =
 viewCartItem : ShoppingCartItem -> Html Msg
 viewCartItem item =
     tr []
-        [ td [] [ text item.description ]
-        , td [] [ text <| moneyToString item.price ]
-        , td [ class "quantity" ] [ text <| String.fromInt item.quantity ]
+        [ td [ class "description" ] [ text item.description ]
+        , td [ class "price" ] [ text <| moneyToString item.price ]
+        , td [ class "quantity" ] [ viewQuantityControl item ]
         , td [ class "total" ] [ text <| moneyToString (itemPrice item.quantity item.price) ]
+        ]
+
+
+viewQuantityControl : ShoppingCartItem -> Html Msg
+viewQuantityControl item =
+    div [ class "row" ]
+        [ button [ onClick (RemoveCartItem item) ] [ text "-" ]
+        , text <| String.fromInt item.quantity
+        , button [ onClick (AddCartItem item) ] [ text "+" ]
         ]
 
 
