@@ -6,7 +6,7 @@ import Html exposing (Html, button, div, h1, table, tbody, td, text, th, thead, 
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Money exposing (..)
-import ShoppingCart exposing (ShoppingCart, ShoppingCartItem, addItem, removeItem)
+import ShoppingCart exposing (ShoppingCart, ShoppingCartItem, addItem, cartValue, itemPrice, removeItem)
 
 
 main =
@@ -113,16 +113,19 @@ viewCart cart =
 
 viewCartItems : ShoppingCart -> Html Msg
 viewCartItems cart =
-    table [ class "cartItems" ]
-        [ thead []
-            [ tr []
-                [ th [ class "description" ] [ text "Description" ]
-                , th [ class "price" ] [ text "Price" ]
-                , th [ class "quantity" ] [ text "Quantity" ]
-                , th [ class "total" ] [ text "Total" ]
+    div [ class "col" ]
+        [ table [ class "cartItems" ]
+            [ thead []
+                [ tr []
+                    [ th [ class "description" ] [ text "Description" ]
+                    , th [ class "price" ] [ text "Price" ]
+                    , th [ class "quantity" ] [ text "Quantity" ]
+                    , th [ class "total" ] [ text "Total" ]
+                    ]
                 ]
+            , tbody [] (List.map viewCartItem cart.items)
             ]
-        , tbody [] (List.map viewCartItem cart.items)
+        , div [ class "row-flex-end" ] [ div [] [ text <| moneyToString <| cartValue cart ] ]
         ]
 
 
@@ -132,7 +135,7 @@ viewCartItem item =
         [ td [ class "description" ] [ text item.description ]
         , td [ class "price" ] [ text <| moneyToString item.price ]
         , td [ class "quantity" ] [ viewQuantityControl item ]
-        , td [ class "total" ] [ text <| moneyToString (itemPrice item.quantity item.price) ]
+        , td [ class "total" ] [ text <| moneyToString (itemPrice item) ]
         ]
 
 
@@ -143,13 +146,6 @@ viewQuantityControl item =
         , text <| String.fromInt item.quantity
         , button [ onClick (AddCartItem item) ] [ text "+" ]
         ]
-
-
-itemPrice : Int -> Money -> Money
-itemPrice quantity price =
-    { amount = price.amount * quantity
-    , currencyCode = price.currencyCode
-    }
 
 
 

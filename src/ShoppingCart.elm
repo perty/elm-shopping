@@ -1,6 +1,6 @@
-module ShoppingCart exposing (ShoppingCart, ShoppingCartItem, addItem, removeItem)
+module ShoppingCart exposing (ShoppingCart, ShoppingCartItem, addItem, cartValue, itemPrice, removeItem)
 
-import Money exposing (Money)
+import Money exposing (Money, eur)
 
 
 type alias ShoppingCart =
@@ -32,6 +32,18 @@ addItem cart item =
 removeItem : ShoppingCart -> SomeItem a -> ShoppingCart
 removeItem cart item =
     { cart | items = changeQuantity cart.items item -1 }
+
+
+itemPrice : ShoppingCartItem -> Money
+itemPrice item =
+    { amount = item.price.amount * item.quantity
+    , currencyCode = item.price.currencyCode
+    }
+
+
+cartValue : ShoppingCart -> Money
+cartValue cart =
+    List.map itemPrice cart.items |> List.foldl Money.add (eur 0)
 
 
 changeQuantity : List ShoppingCartItem -> SomeItem a -> Int -> List ShoppingCartItem
