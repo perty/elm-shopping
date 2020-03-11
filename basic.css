@@ -1,0 +1,23 @@
+.col {
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.cart {
+    border: blue;
+    border-style: solid;
+    padding: 10px;
+}
+
+.quantity {
+    text-align: right;
+}
+
+.total {
+    text-align: right;
+}
