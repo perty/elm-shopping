@@ -1,6 +1,7 @@
 module Main exposing (Model, Msg(..), init, initialModel, main)
 
 import Browser
+import Business.FreeShipping
 import Catalog exposing (CatalogItem, catalogItems)
 import Html exposing (Html, button, div, h1, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class)
@@ -66,21 +67,21 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div [ class "row" ]
-        [ viewCatalog
+        [ viewCatalog <| cartValue model.cart
         , viewCart model.cart
         ]
 
 
-viewCatalog : Html Msg
-viewCatalog =
+viewCatalog : Money -> Html Msg
+viewCatalog cartValue =
     div [ class "col" ]
         [ h1 [] [ text "Catalog" ]
-        , viewCatalogItems
+        , viewCatalogItems cartValue
         ]
 
 
-viewCatalogItems : Html Msg
-viewCatalogItems =
+viewCatalogItems : Money -> Html Msg
+viewCatalogItems cartValue =
     table []
         [ thead []
             [ tr []
@@ -89,23 +90,39 @@ viewCatalogItems =
                 , th [] [ text "Add" ]
                 ]
             ]
-        , tbody [] (List.map viewCatalogItem catalogItems)
+        , tbody [] (List.map (viewCatalogItem cartValue) catalogItems)
         ]
 
 
-viewCatalogItem : CatalogItem -> Html Msg
-viewCatalogItem item =
+viewCatalogItem : Money -> CatalogItem -> Html Msg
+viewCatalogItem cartValue item =
+    let
+        freeShipping =
+            Business.FreeShipping.freeShipping <| Money.add item.price cartValue
+    in
     tr []
         [ td [] [ text item.description ]
         , td [] [ text <| moneyToString item.price ]
-        , td [] [ button [ onClick (AddToCart item) ] [ text "Add" ] ]
+        , td []
+            [ if freeShipping then
+                div [] [ text "Free shipping" ]
+
+              else
+                div [] []
+            , viewAddButton item
+            ]
         ]
+
+
+viewAddButton : CatalogItem -> Html Msg
+viewAddButton item =
+    button [ onClick (AddToCart item) ] [ text "Add" ]
 
 
 viewCart : ShoppingCart -> Html Msg
 viewCart cart =
     div [ class "cart" ]
-        [ div [] [ text "Shopping cart" ]
+        [ h1 [] [ text "Shopping cart" ]
         , text <| "Number of items in cart: " ++ (String.fromInt <| List.sum <| List.map .quantity cart.items)
         , viewCartItems cart
         ]
@@ -125,7 +142,7 @@ viewCartItems cart =
                 ]
             , tbody [] (List.map viewCartItem cart.items)
             ]
-        , div [ class "row-flex-end" ] [ div [] [ text <| moneyToString <| cartValue cart ] ]
+        , viewCartBottomLine cart
         ]
 
 
@@ -145,6 +162,18 @@ viewQuantityControl item =
         [ button [ onClick (RemoveCartItem item) ] [ text "-" ]
         , text <| String.fromInt item.quantity
         , button [ onClick (AddCartItem item) ] [ text "+" ]
+        ]
+
+
+viewCartBottomLine : ShoppingCart -> Html Msg
+viewCartBottomLine cart =
+    div [ class "row-space-between" ]
+        [ if Business.FreeShipping.freeShipping <| cartValue cart then
+            div [] [ text "Free shipping!" ]
+
+          else
+            div [] []
+        , div [] [ text <| moneyToString <| cartValue cart ]
         ]
 
 

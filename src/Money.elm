@@ -1,4 +1,4 @@
-module Money exposing (Money, add, eur, moneyToString, usd)
+module Money exposing (CurrencyCode(..), Money, add, eur, moneyToString, usd)
 
 -- Money is an abstraction of some amount of money in a Money.
 

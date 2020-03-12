@@ -10,11 +10,11 @@
     justify-content: space-between;
 }
 
-.row-flex-end {
+.row-space-between {
     display: flex;
     flex-direction: row;
     flex-flow: wrap;
-    justify-content: flex-end;
+    justify-content: space-between;
 }
 
 .cart {
